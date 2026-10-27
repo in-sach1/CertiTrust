@@ -1,6 +1,8 @@
 target/
 storage/
 data/
+# Local clone accidentally created inside the project; keep it on disk but out of this repository.
+/CertiTrust/
 .idea/
 .vscode/
 *.iml

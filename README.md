@@ -133,6 +133,23 @@ convenient, while production deployments should require certificate-verified TLS
 
 ## Running the Application
 
+### One-command local demo
+
+From the project directory, start an isolated in-memory H2 demo with sample accounts and certificates:
+
+```bash
+./run-demo.sh
+```
+
+Open **http://localhost:8080/login** and use one of the demo credentials below. This launcher uses a temporary,
+in-memory database instead of the persistent `./data/certitrust` database, enables demo data for this run only, and
+ignores inherited initial-admin bootstrap variables. Stop it with **Ctrl+C**; the in-memory demo data is discarded.
+It does not delete or change your existing H2 database. Java 17+ and Maven must be installed.
+If port 8080 is already in use, run `PORT=8081 ./run-demo.sh` and open **http://localhost:8081/login** instead.
+
+To run against the persistent H2 profile or configure a real administrator for a new database, use the manual commands
+below instead.
+
 ```bash
 export INITIAL_ADMIN_EMAIL=admin@example.com
 export INITIAL_ADMIN_PASSWORD='replace-with-a-strong-unique-password'
