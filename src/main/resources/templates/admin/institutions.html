@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/dash :: dash(~{::title}, 'institutions', ~{::main})}">
+<head><title>Institutions | CertiTrust</title></head>
+<body>
+<main>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div><h1 class="h3 mb-0">Institutions</h1><div class="text-muted">Organisations that may issue certificates. A disabled institution cannot issue new ones.</div></div>
+        <button class="btn btn-glow" type="button" data-bs-toggle="modal" data-bs-target="#instAddModal"><i class="bi bi-building-add"></i> Add institution</button>
+    </div>
+
+    <div class="glass panel">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead><tr><th>Logo</th><th>Name</th><th>Address</th><th>Email</th><th>Website</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                <tr th:each="i : ${institutions}">
+                    <td><img th:if="${i.logoPath != null}" th:src="@{/logo/{id}(id=${i.id})}" alt="" style="height:36px;max-width:60px;object-fit:contain;background:#fff;border-radius:6px;padding:2px">
+                        <i th:if="${i.logoPath == null}" class="bi bi-building fs-4 text-muted"></i></td>
+                    <td th:text="${i.name}">Name</td>
+                    <td th:text="${i.address != null ? i.address : '-'}">address</td>
+                    <td th:text="${i.email != null ? i.email : '-'}">mail</td>
+                    <td><a th:if="${i.website != null}" th:href="${i.website}" th:text="${i.website}" target="_blank" rel="noopener noreferrer">site</a><span th:if="${i.website == null}">-</span></td>
+                    <td><span class="badge-soft" th:classappend="'badge-' + ${i.status}" th:text="${i.status}">ACTIVE</span></td>
+                    <td class="text-end text-nowrap">
+                        <button type="button" class="btn btn-sm btn-ghost" title="Edit" data-bs-toggle="modal" data-bs-target="#instEditModal"
+                                data-edit-target="instEditModal" data-action-prefix="/admin/institutions/"
+                                th:attr="data-id=${i.id}, data-name=${i.name}, data-address=${i.address ?: ''}, data-email=${i.email ?: ''}, data-website=${i.website ?: ''}, data-status=${i.status}">
+                            <i class="bi bi-pencil"></i></button>
+                        <form class="d-inline" method="post" th:action="@{/admin/institutions/{id}/toggle(id=${i.id})}">
+                            <button type="submit" class="btn btn-sm btn-ghost" th:title="${i.status.name() == 'ACTIVE' ? 'Disable' : 'Enable'}">
+                                <i class="bi" th:classappend="${i.status.name() == 'ACTIVE' ? 'bi-pause-circle' : 'bi-play-circle'}"></i></button></form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(institutions)}"><td colspan="7" class="text-center text-muted py-4">No institutions yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add institution -->
+    <div class="modal fade" id="instAddModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+            <form method="post" enctype="multipart/form-data" th:action="@{/admin/institutions}">
+                <div class="modal-header"><h5 class="modal-title">Add institution</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="mb-3"><label class="form-label">Name</label><input class="form-control" name="name" maxlength="150" required></div>
+                    <div class="mb-3"><label class="form-label">Address</label><input class="form-control" name="address" maxlength="255"></div>
+                    <div class="row"><div class="col-md-6 mb-3"><label class="form-label">Email</label><input class="form-control" type="email" name="email" maxlength="150"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Website</label><input class="form-control" name="website" maxlength="200" placeholder="https://"></div></div>
+                    <div class="row"><div class="col-md-6 mb-3"><label class="form-label">Status</label>
+                        <select class="form-select" name="status"><option value="ACTIVE">Active</option><option value="DISABLED">Disabled</option></select></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Logo <span class="text-muted">(PNG/JPEG, max 1 MB)</span></label>
+                        <input class="form-control" type="file" name="logo" accept="image/png,image/jpeg"></div></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-glow">Add institution</button></div>
+            </form>
+        </div></div>
+    </div>
+
+    <!-- Edit institution -->
+    <div class="modal fade" id="instEditModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+            <form method="post" enctype="multipart/form-data" th:action="@{/admin/institutions}">
+                <div class="modal-header"><h5 class="modal-title">Edit institution</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="mb-3"><label class="form-label">Name</label><input class="form-control" name="name" maxlength="150" required></div>
+                    <div class="mb-3"><label class="form-label">Address</label><input class="form-control" name="address" maxlength="255"></div>
+                    <div class="row"><div class="col-md-6 mb-3"><label class="form-label">Email</label><input class="form-control" type="email" name="email" maxlength="150"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Website</label><input class="form-control" name="website" maxlength="200" placeholder="https://"></div></div>
+                    <div class="row"><div class="col-md-6 mb-3"><label class="form-label">Status</label>
+                        <select class="form-select" name="status"><option value="ACTIVE">Active</option><option value="DISABLED">Disabled</option></select></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Replace logo <span class="text-muted">(optional)</span></label>
+                        <input class="form-control" type="file" name="logo" accept="image/png,image/jpeg"></div></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-glow">Save changes</button></div>
+            </form>
+        </div></div>
+    </div>
+</main>
+</body>
+</html>

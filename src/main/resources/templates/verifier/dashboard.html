@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/dash :: dash(~{::title}, 'dashboard', ~{::main})}">
+<head><title>Verifier Dashboard | CertiTrust</title></head>
+<body>
+<main>
+    <div class="mb-4"><h1 class="h3 mb-0">Verifier dashboard</h1><div class="text-muted">Check certificates and keep a record of every verification.</div></div>
+    <div class="glass panel mb-4">
+        <h5>Quick verification</h5>
+        <form th:action="@{/verify}" method="get" class="row g-2">
+            <div class="col-md-7"><input class="form-control form-control-lg" name="certificateId" placeholder="CERT-2026-000123" maxlength="64" required></div>
+            <div class="col-md-5 d-flex gap-2">
+                <button class="btn btn-glow btn-lg flex-fill" type="submit"><i class="bi bi-shield-check"></i> Verify</button>
+                <a class="btn btn-ghost btn-lg" th:href="@{/verify}"><i class="bi bi-qr-code-scan"></i> Scan QR</a>
+            </div>
+        </form>
+    </div>
+    <div class="row g-3 mb-4">
+        <div class="col-sm-4"><div class="glass kpi hover-lift"><div class="icon-box"><i class="bi bi-search"></i></div><div>
+            <div class="val" th:attr="data-count=${stats.total}">0</div><div class="lbl">Certificates checked</div></div></div></div>
+        <div class="col-sm-4"><div class="glass kpi hover-lift"><div class="icon-box"><i class="bi bi-patch-check"></i></div><div>
+            <div class="val" th:attr="data-count=${stats.verified}">0</div><div class="lbl">Verified as valid</div><div class="trend up">authentic</div></div></div></div>
+        <div class="col-sm-4"><div class="glass kpi hover-lift"><div class="icon-box"><i class="bi bi-exclamation-triangle"></i></div><div>
+            <div class="val" th:attr="data-count=${stats.flagged}">0</div><div class="lbl">Revoked / expired / invalid</div><div class="trend down">needs attention</div></div></div></div>
+    </div>
+    <div class="row g-3">
+        <div class="col-lg-7"><div class="glass panel h-100">
+            <div class="d-flex justify-content-between"><h5>Recent verifications</h5><a th:href="@{/history}" class="small">View all</a></div>
+            <p class="text-muted small" th:if="${#lists.isEmpty(recent)}">You have not verified any certificate while logged in yet.</p>
+            <ul class="activity"><li th:each="n : ${recent}"><i class="bi bi-activity"></i><div><span th:text="${n.text}">item</span><br><small th:text="${#temporals.format(n.time, 'dd MMM yyyy, HH:mm')}">time</small></div></li></ul>
+        </div></div>
+        <div class="col-lg-5"><div class="glass panel h-100"><h5>Tools</h5>
+            <div class="d-grid gap-2">
+                <a class="btn btn-ghost text-start" th:href="@{/verifier/certificates}"><i class="bi bi-search me-2"></i>Search certificates</a>
+                <a class="btn btn-ghost text-start" th:href="@{/history}"><i class="bi bi-clock-history me-2"></i>Verification history</a>
+                <a class="btn btn-ghost text-start" th:href="@{/verify}"><i class="bi bi-qr-code-scan me-2"></i>Scan a QR code</a>
+            </div>
+            <p class="small text-muted mt-3 mb-0">Verifiers cannot issue or revoke certificates.</p>
+        </div></div>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/dash :: dash(~{::title}, 'reports', ~{::main})}">
+<head><title>Reports | CertiTrust</title></head>
+<body>
+<main>
+    <div class="mb-4"><h1 class="h3 mb-0">Reports</h1>
+        <div class="text-muted">Certificate records grouped and ranked with Java collections (<span th:text="${report.total}">0</span> certificates).</div></div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6"><div class="glass panel"><h5>Certificates by type</h5><div class="chart-box"><canvas id="typeChart"></canvas></div></div></div>
+        <div class="col-lg-6"><div class="glass panel"><h5>Verification outcomes</h5><div class="chart-box"><canvas id="outcomeChart"></canvas></div></div></div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-6 col-xl-3"><div class="glass panel h-100"><h5>By type</h5>
+            <table class="table table-sm mb-1"><tbody>
+                <tr th:each="e : ${report.byType}"><td th:text="${e.key.label}">Type</td><td class="text-end fw-bold" th:text="${e.value}">0</td></tr>
+            </tbody></table><div class="small text-muted">EnumMap</div></div></div>
+        <div class="col-md-6 col-xl-3"><div class="glass panel h-100"><h5>By institution</h5>
+            <table class="table table-sm mb-1"><tbody>
+                <tr th:each="e : ${report.byInstitution}"><td th:text="${e.key}">Institution</td><td class="text-end fw-bold" th:text="${e.value}">0</td></tr>
+                <tr th:if="${report.byInstitution.isEmpty()}"><td colspan="2" class="text-muted">No certificates yet.</td></tr>
+            </tbody></table><div class="small text-muted">TreeMap (sorted by name)</div></div></div>
+        <div class="col-md-6 col-xl-3"><div class="glass panel h-100"><h5>By status</h5>
+            <table class="table table-sm mb-1"><tbody>
+                <tr th:each="e : ${report.byStatus}"><td><span class="badge-soft" th:classappend="'badge-' + ${e.key}" th:text="${e.key}">VALID</span></td><td class="text-end fw-bold" th:text="${e.value}">0</td></tr>
+            </tbody></table><div class="small text-muted">LinkedHashMap</div></div></div>
+        <div class="col-md-6 col-xl-3"><div class="glass panel h-100"><h5>Issuers</h5>
+            <ul class="list-unstyled mb-1">
+                <li th:each="n : ${report.issuers}"><i class="bi bi-person-badge text-info me-2"></i><span th:text="${n}">Issuer</span></li>
+                <li th:if="${report.issuers.isEmpty()}" class="text-muted">None yet.</li>
+            </ul><div class="small text-muted">TreeSet (no duplicates)</div></div></div>
+    </div>
+
+    <div class="glass panel">
+        <h5>Most verified certificates</h5>
+        <div class="table-responsive"><table class="table table-hover align-middle mb-0">
+            <thead><tr><th>Certificate ID</th><th>Recipient</th><th>Course</th><th>Status</th><th class="text-end">Verifications</th></tr></thead>
+            <tbody>
+            <tr th:each="c : ${report.top}">
+                <td><a th:href="@{/certificate/{id}(id=${c.certificateId})}" th:text="${c.certificateId}">ID</a></td>
+                <td th:text="${c.recipientName}">Name</td><td th:text="${c.course}">Course</td>
+                <td><span class="badge-soft" th:classappend="'badge-' + ${c.displayStatus}" th:text="${c.displayStatus}">VALID</span></td>
+                <td class="text-end fw-bold" th:text="${c.verificationCount}">0</td></tr>
+            <tr th:if="${report.top.isEmpty()}"><td colspan="5" class="text-center text-muted py-3">No certificates yet.</td></tr>
+            </tbody></table></div>
+        <div class="small text-muted mt-2">List sorted with a Comparator, limited to the top 5.</div>
+    </div>
+
+    <script th:inline="javascript">
+    (function () {
+        var c = /*[[${charts}]]*/ {};
+        Chart.defaults.color = '#93a4c3';
+        Chart.defaults.borderColor = 'rgba(255,255,255,.08)';
+        function bar(id, labels, data, color) {
+            new Chart(document.getElementById(id), { type: 'bar',
+                data: { labels: labels, datasets: [{ data: data, backgroundColor: color, borderRadius: 8 }] },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } },
+                           scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } } });
+        }
+        bar('typeChart', c.typeLabels, c.typeCounts, '#22d3ee');
+        bar('outcomeChart', c.outcomeLabels, c.outcomeCounts, '#8b5cf6');
+    })();
+    </script>
+</main>
+</body>
+</html>

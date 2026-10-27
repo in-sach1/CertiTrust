@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/public :: pub(~{::title}, ~{::main})}">
+<head><title>Certificate Details | CertiTrust</title></head>
+<body>
+<main class="container pb-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4 no-print">
+        <div>
+            <span class="kicker"><i class="bi bi-file-earmark-check"></i> Certificate</span>
+            <h1 class="h2 mt-2 mb-0" th:text="${cert.certificateId}">CERT-2026-000001</h1>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-glow" th:href="@{/certificate/{id}/download(id=${cert.certificateId})}"><i class="bi bi-download"></i> Download Certificate</a>
+            <a class="btn btn-ghost" th:href="@{/verify(certificateId=${cert.certificateId})}"><i class="bi bi-arrow-repeat"></i> Verify Again</a>
+            <button type="button" class="btn btn-ghost" onclick="window.print()"><i class="bi bi-printer"></i> Print Certificate</button>
+            <button type="button" class="btn btn-outline-danger" th:if="${canRevoke}" data-bs-toggle="modal" data-bs-target="#revokeDetailModal"><i class="bi bi-slash-circle"></i> Revoke</button>
+        </div>
+    </div>
+
+    <div class="alert alert-danger" th:if="${!integrity}">
+        <i class="bi bi-exclamation-octagon me-2"></i><strong>Integrity check failed.</strong>
+        The stored data of this certificate does not match its digital fingerprint.
+    </div>
+
+    <div class="row g-4">
+        <!-- Certificate preview -->
+        <div class="col-lg-7">
+            <div class="cert-preview" th:classappend="${cert.status.name() == 'REVOKED' ? 'revoked' : ''}">
+                <img th:if="${cert.institution.logoPath != null}" th:src="@{/logo/{id}(id=${cert.institution.id})}" alt="" style="height:60px;margin-bottom:.5rem">
+                <div class="text-uppercase small fw-bold" style="letter-spacing:2px;color:#2563eb" th:text="${cert.institutionName}">Institution</div>
+                <h3 class="my-2 text-uppercase" th:text="'Certificate of ' + ${cert.certificateType.label}">Certificate</h3>
+                <div class="fst-italic" style="color:#5a6882">This certificate is proudly presented to</div>
+                <div class="rname" th:text="${cert.recipientName}">Recipient</div>
+                <div class="fst-italic mt-2" style="color:#5a6882">for</div>
+                <div class="fw-bold fs-4" style="color:#2563eb" th:text="${cert.course}">Course</div>
+                <div class="small mt-2" style="color:#5a6882">
+                    Issued <span th:text="${#temporals.format(cert.issueDate, 'dd MMMM yyyy')}">date</span>
+                    <span th:if="${cert.expiryDate != null}"> &middot; Valid until <span th:text="${#temporals.format(cert.expiryDate, 'dd MMMM yyyy')}">date</span></span>
+                    <span th:if="${cert.grade != null}"> &middot; Grade <span th:text="${cert.grade}">A</span></span>
+                </div>
+                <div class="d-flex justify-content-between align-items-end mt-4 text-start">
+                    <div class="small"><div style="border-top:1px solid #0b1e3f;padding-top:4px;min-width:150px"><strong th:text="${cert.issuer.name}">Issuer</strong><br>Authorized Signatory</div></div>
+                    <div class="text-center">
+                        <img class="qr" th:src="@{/certificate/{id}/qr(id=${cert.certificateId})}" alt="QR code for this certificate">
+                        <div class="small">Scan to verify</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information -->
+        <div class="col-lg-5">
+            <div class="glass p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 mb-0">Certificate information</h2>
+                    <span class="badge-soft" th:classappend="'badge-' + ${cert.displayStatus}" th:text="${cert.displayStatus}">VALID</span>
+                </div>
+                <dl class="kv">
+                    <dt>Certificate ID</dt><dd th:text="${cert.certificateId}">ID</dd>
+                    <dt>Recipient</dt><dd th:text="${cert.recipientName}">Name</dd>
+                    <dt>Course / Degree</dt><dd th:text="${cert.course}">Course</dd>
+                    <dt>Type</dt><dd th:text="${cert.certificateType.label}">Type</dd>
+                    <dt>Institution</dt><dd th:text="${cert.institutionName}">Institution</dd>
+                    <dt>Issuer</dt><dd th:text="${cert.issuer.name}">Issuer</dd>
+                    <dt>Issue date</dt><dd th:text="${#temporals.format(cert.issueDate, 'dd MMM yyyy')}">date</dd>
+                    <dt>Expiry date</dt><dd th:text="${cert.expiryDate != null ? #temporals.format(cert.expiryDate, 'dd MMM yyyy') : 'No expiry'}">date</dd>
+                    <dt th:if="${cert.grade != null}">Grade / Score</dt><dd th:if="${cert.grade != null}" th:text="${cert.grade}">A</dd>
+                    <dt th:if="${cert.additionalInfo != null}">Additional info</dt><dd th:if="${cert.additionalInfo != null}" th:text="${cert.additionalInfo}">info</dd>
+                    <dt>Verifications</dt><dd th:text="${cert.verificationCount}">0</dd>
+                    <dt th:if="${canSeePrivate}">Recipient e-mail</dt><dd th:if="${canSeePrivate}" th:text="${cert.recipientEmail}">mail</dd>
+                    <dt>Digital signature (SHA-256)</dt>
+                    <dd><span class="hash" th:text="${cert.shortHash}">9f2c…b81e</span><br>
+                        <details class="mt-1"><summary class="small text-muted">Show full hash</summary><span class="hash" th:text="${cert.certificateHash}">hash</span></details></dd>
+                    <dt>Verification URL</dt><dd><a class="small" th:href="${verifyUrl}" th:text="${verifyUrl}">url</a></dd>
+                </dl>
+                <div th:if="${!revocations.isEmpty()}" class="alert alert-warning mt-3 mb-0">
+                    <strong><i class="bi bi-slash-circle me-1"></i>Revoked</strong> on
+                    <span th:text="${#temporals.format(revocations[0].revokedAt, 'dd MMM yyyy, HH:mm')}">date</span><br>
+                    Reason: <span th:text="${revocations[0].reason}">reason</span>
+                </div>
+            </div>
+
+            <div class="glass p-4 mt-4 no-print" th:if="${canSeePrivate and !revocations.isEmpty()}">
+                <h2 class="h6">Revocation history</h2>
+                <ul class="activity">
+                    <li th:each="r : ${revocations}"><i class="bi bi-slash-circle"></i>
+                        <div><span th:text="${r.reason}">reason</span><br>
+                            <small>by <span th:text="${r.revokedBy.name}">user</span> &middot; <span th:text="${#temporals.format(r.revokedAt, 'dd MMM yyyy, HH:mm')}">date</span></small></div></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revoke modal (issuer of this certificate / admin) -->
+    <div class="modal fade" id="revokeDetailModal" tabindex="-1" aria-hidden="true" th:if="${canRevoke}">
+        <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+            <form th:action="@{/manage/certificates/{id}/revoke(id=${cert.certificateId})}" method="post">
+                <input type="hidden" name="from" value="detail">
+                <div class="modal-header"><h5 class="modal-title">Revoke certificate</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <p class="text-muted">Revoked certificates stay in the database, but verification will show them as <strong>revoked</strong> together with your reason.</p>
+                    <label class="form-label" for="reasonDetail">Reason for revocation</label>
+                    <textarea class="form-control" id="reasonDetail" name="reason" rows="3" maxlength="500" required></textarea>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-danger">Revoke certificate</button></div>
+            </form>
+        </div></div>
+    </div>
+</main>
+</body>
+</html>

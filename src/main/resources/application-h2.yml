@@ -1,0 +1,8 @@
+# Zero-setup profile: stores data in a local file (./data) instead of MySQL.
+# Run with:  mvn spring-boot:run -Dspring-boot.run.profiles=h2
+spring:
+  datasource:
+    url: jdbc:h2:file:./data/certitrust;MODE=MySQL;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver

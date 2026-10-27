@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/dash :: dash(~{::title}, 'audit', ~{::main})}">
+<head><title>Audit Trail | CertiTrust</title></head>
+<body>
+<main>
+    <div class="mb-4"><h1 class="h3 mb-0">Audit trail</h1>
+        <div class="text-muted">Certificate creation, views, verifications, revocations, logins and user changes (<span th:text="${page.totalElements}">0</span> entries).</div></div>
+    <div class="glass panel">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead><tr><th>Time</th><th>Action</th><th>Actor</th><th>Details</th><th>IP</th></tr></thead>
+                <tbody>
+                <tr th:each="a : ${page.content}">
+                    <td class="text-nowrap" th:text="${#temporals.format(a.createdAt, 'dd MMM yyyy, HH:mm:ss')}">time</td>
+                    <td><span class="badge text-bg-secondary" th:text="${a.action}">ACTION</span></td>
+                    <td th:text="${a.actor}">actor</td>
+                    <td style="min-width:260px" th:text="${a.details}">details</td>
+                    <td th:text="${a.ipAddress != null ? a.ipAddress : '-'}">ip</td>
+                </tr>
+                <tr th:if="${page.empty}"><td colspan="5" class="text-center text-muted py-4">No entries yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:replace="~{fragments/common :: pager(${page}, '/admin/audit')}"></div>
+    </div>
+</main>
+</body>
+</html>

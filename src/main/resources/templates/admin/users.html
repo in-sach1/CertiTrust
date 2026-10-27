@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/dash :: dash(~{::title}, 'users', ~{::main})}">
+<head><title>Users | CertiTrust</title></head>
+<body>
+<main>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div><h1 class="h3 mb-0">Users</h1><div class="text-muted">Create, edit, enable, disable and delete accounts.</div></div>
+        <button class="btn btn-glow" type="button" data-bs-toggle="modal" data-bs-target="#userAddModal"><i class="bi bi-person-plus"></i> Add user</button>
+    </div>
+
+    <form class="glass panel mb-3" th:action="@{/admin/users}" method="get">
+        <div class="row g-2"><div class="col-md-9"><input class="form-control" name="q" th:value="${q}" placeholder="Search by name or email"></div>
+            <div class="col-md-3 d-flex gap-2"><button class="btn btn-glow flex-fill" type="submit"><i class="bi bi-search"></i> Search</button>
+                <a class="btn btn-ghost" th:href="@{/admin/users}"><i class="bi bi-x-lg"></i></a></div></div>
+    </form>
+
+    <div class="glass panel">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Institution</th><th>Status</th><th>Created</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                <tr th:each="u : ${page.content}">
+                    <td th:text="${u.name}">Name</td>
+                    <td th:text="${u.email}">mail</td>
+                    <td><span class="badge text-bg-secondary" th:text="${u.role}">ROLE</span></td>
+                    <td th:text="${u.institution != null ? u.institution.name : '-'}">-</td>
+                    <td><span class="badge-soft" th:classappend="${u.enabled ? 'badge-ACTIVE' : 'badge-DISABLED'}" th:text="${u.enabled ? 'Active' : 'Disabled'}">Active</span></td>
+                    <td th:text="${#temporals.format(u.createdAt, 'dd MMM yyyy')}">date</td>
+                    <td class="text-end text-nowrap">
+                        <button type="button" class="btn btn-sm btn-ghost" title="Edit" data-bs-toggle="modal" data-bs-target="#userEditModal"
+                                data-edit-target="userEditModal" data-action-prefix="/admin/users/"
+                                th:attr="data-id=${u.id}, data-name=${u.name}, data-email=${u.email}, data-role=${u.role}, data-enabled=${u.enabled}, data-institution-id=${u.institution != null ? u.institution.id : ''}">
+                            <i class="bi bi-pencil"></i></button>
+                        <form class="d-inline" method="post" th:action="@{/admin/users/{id}/toggle(id=${u.id})}">
+                            <button type="submit" class="btn btn-sm btn-ghost" th:title="${u.enabled ? 'Disable' : 'Enable'}">
+                                <i class="bi" th:classappend="${u.enabled ? 'bi-person-dash' : 'bi-person-check'}"></i></button></form>
+                        <form class="d-inline" method="post" th:action="@{/admin/users/{id}/delete(id=${u.id})}" data-confirm="Delete this user permanently?">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button></form>
+                    </td>
+                </tr>
+                <tr th:if="${page.empty}"><td colspan="7" class="text-center text-muted py-4">No users found.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <nav th:if="${page.totalPages > 1}" class="mt-3" aria-label="Pages">
+            <ul class="pagination pagination-sm justify-content-center mb-0 flex-wrap">
+                <li class="page-item" th:classappend="${page.first ? 'disabled' : ''}"><a class="page-link" th:href="@{/admin/users(page=${page.number - 1}, q=${q})}">Previous</a></li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" th:classappend="${i == page.number ? 'active' : ''}"><a class="page-link" th:href="@{/admin/users(page=${i}, q=${q})}" th:text="${i + 1}">1</a></li>
+                <li class="page-item" th:classappend="${page.last ? 'disabled' : ''}"><a class="page-link" th:href="@{/admin/users(page=${page.number + 1}, q=${q})}">Next</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Add user -->
+    <div class="modal fade" id="userAddModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+            <form method="post" th:action="@{/admin/users}">
+                <div class="modal-header"><h5 class="modal-title">Add user</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="mb-3"><label class="form-label">Full name</label><input class="form-control" name="name" maxlength="100" required></div>
+                    <div class="mb-3"><label class="form-label">Email</label><input class="form-control" type="email" name="email" maxlength="150" required></div>
+                    <div class="mb-3"><label class="form-label">Password</label><input class="form-control" type="password" name="password" autocomplete="new-password" required>
+                        <div class="form-text text-muted">8+ characters with a letter and a number.</div></div>
+                    <div class="row"><div class="col-6 mb-3"><label class="form-label">Role</label>
+                        <select class="form-select" name="role"><option th:each="r : ${roles}" th:value="${r}" th:text="${r}">ROLE</option></select></div>
+                        <div class="col-6 mb-3"><label class="form-label">Status</label>
+                        <select class="form-select" name="enabled"><option value="true">Enabled</option><option value="false">Disabled</option></select></div></div>
+                    <div class="mb-3 institution-row"><label class="form-label">Institution (issuers)</label>
+                        <select class="form-select" name="institutionId"><option value="">- choose -</option>
+                            <option th:each="i : ${institutions}" th:value="${i.id}" th:text="${i.name}">Institution</option></select></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-glow">Create user</button></div>
+            </form>
+        </div></div>
+    </div>
+
+    <!-- Edit user (app.js fills the fields from the clicked row) -->
+    <div class="modal fade" id="userEditModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+            <form method="post" th:action="@{/admin/users}">
+                <div class="modal-header"><h5 class="modal-title">Edit user</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="mb-3"><label class="form-label">Full name</label><input class="form-control" name="name" maxlength="100" required></div>
+                    <div class="mb-3"><label class="form-label">Email</label><input class="form-control" type="email" name="email" maxlength="150" required></div>
+                    <div class="mb-3"><label class="form-label">New password <span class="text-muted">(leave blank to keep)</span></label>
+                        <input class="form-control" type="password" name="password" autocomplete="new-password"></div>
+                    <div class="row"><div class="col-6 mb-3"><label class="form-label">Role</label>
+                        <select class="form-select" name="role"><option th:each="r : ${roles}" th:value="${r}" th:text="${r}">ROLE</option></select></div>
+                        <div class="col-6 mb-3"><label class="form-label">Status</label>
+                        <select class="form-select" name="enabled"><option value="true">Enabled</option><option value="false">Disabled</option></select></div></div>
+                    <div class="mb-3 institution-row"><label class="form-label">Institution (issuers)</label>
+                        <select class="form-select" name="institutionId"><option value="">- choose -</option>
+                            <option th:each="i : ${institutions}" th:value="${i.id}" th:text="${i.name}">Institution</option></select></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-glow">Save changes</button></div>
+            </form>
+        </div></div>
+    </div>
+</main>
+</body>
+</html>

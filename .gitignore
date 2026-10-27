@@ -1,0 +1,27 @@
+target/
+storage/
+data/
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Local configuration, credentials, and cryptographic material
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+
+# Local databases, backups, and logs
+*.db
+*.mv.db
+*.sql.gz
+*.dump
+*.bak
+*.backup
+*.log
+backups/

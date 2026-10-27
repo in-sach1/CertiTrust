@@ -1,0 +1,37 @@
+digraph Flow {
+  graph [rankdir=TB fontname="Helvetica" nodesep=0.5 ranksep=0.45 labelloc=t label=<<B>Certificate verification flow</B>> fontsize=18 pad=0.4 bgcolor=white];
+  node [fontname="Helvetica" fontsize=11 style="rounded,filled" shape=box fillcolor="#dbeafe" color="#1e3a8a"];
+  edge [fontname="Helvetica" fontsize=10];
+  a [label="User enters the ID or scans the QR code" shape=ellipse fillcolor="#e9d5ff" color="#6b21a8"];
+  b [label="ID shaped like\nCERT-YYYY-NNNNNN?" shape=diamond style=filled fillcolor="#fde68a" color="#92400e"];
+  nf1 [label="NOT FOUND\n(with format hint)" fillcolor="#fecaca" color="#991b1b"];
+  c [label="Certificate exists?" shape=diamond style=filled fillcolor="#fde68a" color="#92400e"];
+  nf2 [label="NOT FOUND" fillcolor="#fecaca" color="#991b1b"];
+  d [label="Recomputed hash\n= stored hash?" shape=diamond style=filled fillcolor="#fde68a" color="#92400e"];
+  tp [label="TAMPERED" fillcolor="#fecaca" color="#991b1b"];
+  e [label="Revoked?" shape=diamond style=filled fillcolor="#fde68a" color="#92400e"];
+  rv [label="REVOKED\n(show date and reason)" fillcolor="#fed7aa" color="#9a3412"];
+  f [label="Expiry date passed?" shape=diamond style=filled fillcolor="#fde68a" color="#92400e"];
+  ex [label="EXPIRED" fillcolor="#fed7aa" color="#9a3412"];
+  ok [label="VERIFIED" fillcolor="#bbf7d0" color="#166534"];
+  g [label="Count the check, write verification log + audit"];
+  h [label="Show result card" shape=ellipse fillcolor="#e9d5ff" color="#6b21a8"];
+  a -> b;
+  b -> nf1 [label="no"];
+  b -> c [label="yes"];
+  c -> nf2 [label="no"];
+  c -> d [label="yes"];
+  d -> tp [label="no"];
+  d -> e [label="yes"];
+  e -> rv [label="yes"];
+  e -> f [label="no"];
+  f -> ex [label="yes"];
+  f -> ok [label="no"];
+  nf1 -> g;
+  nf2 -> g;
+  tp -> g;
+  rv -> g;
+  ex -> g;
+  ok -> g;
+  g -> h;
+}

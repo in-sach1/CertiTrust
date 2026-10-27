@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/public :: pub(~{::title}, ~{::main})}">
+<head><title>About | CertiTrust</title></head>
+<body>
+<main class="container pb-5" style="max-width:960px">
+    <div class="text-center mb-5">
+        <span class="kicker">About CertiTrust</span>
+        <h1 class="section-title mt-3">Verify Every Credential. <span class="text-gradient">Trust Every Certificate.</span></h1>
+        <p class="text-muted">CertiTrust helps institutions issue tamper-proof digital certificates and lets anyone check them in seconds.</p>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-6"><div class="glass p-4 h-100"><div class="icon-box"><i class="bi bi-bullseye"></i></div><h5>Our mission</h5>
+            <p class="text-muted mb-0">Fake certificates cost employers time and honest graduates their credibility. CertiTrust gives every certificate a unique ID, a QR code and a cryptographic fingerprint, so authenticity can be proven instantly instead of by e-mail and phone calls.</p></div></div>
+        <div class="col-md-6"><div class="glass p-4 h-100"><div class="icon-box"><i class="bi bi-hash"></i></div><h5>How the protection works</h5>
+            <p class="text-muted mb-0">When a certificate is issued, a SHA-256 hash of its key data is stored. On every verification the hash is recomputed. If anybody changes the record afterwards, the two values differ and the certificate is flagged as tampered.</p></div></div>
+        <div class="col-md-6"><div class="glass p-4 h-100"><div class="icon-box"><i class="bi bi-people"></i></div><h5>Who uses it</h5>
+            <p class="text-muted mb-0"><strong>Issuers</strong> create and revoke certificates, <strong>verifiers</strong> (recruiters, employers) check them and keep a history, and <strong>administrators</strong> manage users, institutions and audit logs. Anyone can verify a certificate without an account.</p></div></div>
+        <div class="col-md-6"><div class="glass p-4 h-100"><div class="icon-box"><i class="bi bi-cpu"></i></div><h5>Technology</h5>
+            <p class="text-muted mb-0">Java 17, Spring Boot, Spring Security, Spring Data JPA, MySQL, Thymeleaf, Bootstrap 5, ZXing (QR codes) and OpenPDF (PDF certificates).</p></div></div>
+    </div>
+    <div class="text-center mt-5"><a class="btn btn-glow btn-lg px-4" th:href="@{/verify}">Verify a certificate</a></div>
+</main>
+</body>
+</html>

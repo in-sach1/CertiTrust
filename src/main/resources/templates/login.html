@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/public :: pub(~{::title}, ~{::main})}">
+<head><title>Login | CertiTrust</title></head>
+<body>
+<main class="container pb-5" style="max-width:480px">
+    <div class="text-center mb-4">
+        <h1 class="section-title">Welcome <span class="text-gradient">back</span></h1>
+        <p class="text-muted">Sign in to your CertiTrust account.</p>
+    </div>
+    <div class="glass p-4">
+        <div class="alert alert-danger" th:if="${param.error}"><i class="bi bi-x-circle me-1"></i> Invalid email or password.</div>
+        <div class="alert alert-warning" th:if="${param.disabled}"><i class="bi bi-hourglass-split me-1"></i> This account is disabled or still waiting for administrator approval.</div>
+        <div class="alert alert-success" th:if="${param.logout}"><i class="bi bi-check-circle me-1"></i> You have been signed out.</div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="mb-3"><label class="form-label" for="email">Email</label>
+                <input class="form-control form-control-lg" type="email" id="email" name="email" autocomplete="username" required autofocus></div>
+            <div class="mb-3"><label class="form-label" for="password">Password</label>
+                <input class="form-control form-control-lg" type="password" id="password" name="password" autocomplete="current-password" required></div>
+            <button type="submit" class="btn btn-glow btn-lg w-100" data-loading><i class="bi bi-box-arrow-in-right"></i> Login</button>
+        </form>
+        <p class="text-center text-muted mt-3 mb-0">No account yet? <a th:href="@{/register}">Register</a></p>
+    </div>
+
+    <div class="demo-box mt-4" th:if="${demoMode}">
+        <strong><i class="bi bi-info-circle"></i> DEMO credentials</strong> (sample data - click to fill in):
+        <div class="d-flex flex-wrap gap-2 mt-2">
+            <button type="button" class="btn btn-sm btn-ghost" data-fill-email="admin@demo.com" data-fill-pass="Admin@123">Admin</button>
+            <button type="button" class="btn btn-sm btn-ghost" data-fill-email="issuer@demo.com" data-fill-pass="Issuer@123">Issuer</button>
+            <button type="button" class="btn btn-sm btn-ghost" data-fill-email="verifier@demo.com" data-fill-pass="Verifier@123">Verifier</button>
+        </div>
+    </div>
+</main>
+</body>
+</html>

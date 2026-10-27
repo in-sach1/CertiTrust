@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/dash :: dash(~{::title}, 'issue', ~{::main})}">
+<head><title>Issue Certificate | CertiTrust</title></head>
+<body>
+<main>
+    <div class="mb-4"><h1 class="h3 mb-0">Issue a certificate</h1>
+        <div class="text-muted">A unique ID, SHA-256 hash, QR code and PDF are generated automatically.</div></div>
+    <form class="glass p-4" th:action="@{/issuer/issue}" th:object="${form}" method="post" novalidate>
+        <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}"><div th:each="e : ${#fields.globalErrors()}" th:text="${e}">error</div></div>
+        <div class="row g-3">
+            <div class="col-md-6"><label class="form-label" for="recipientName">Recipient name</label>
+                <input class="form-control" id="recipientName" th:field="*{recipientName}" maxlength="120">
+                <div class="text-danger small" th:if="${#fields.hasErrors('recipientName')}" th:errors="*{recipientName}">error</div></div>
+            <div class="col-md-6"><label class="form-label" for="recipientEmail">Recipient email</label>
+                <input class="form-control" id="recipientEmail" type="email" th:field="*{recipientEmail}" maxlength="150">
+                <div class="text-danger small" th:if="${#fields.hasErrors('recipientEmail')}" th:errors="*{recipientEmail}">error</div></div>
+            <div class="col-md-8"><label class="form-label" for="course">Course / Degree</label>
+                <input class="form-control" id="course" th:field="*{course}" maxlength="200">
+                <div class="text-danger small" th:if="${#fields.hasErrors('course')}" th:errors="*{course}">error</div></div>
+            <div class="col-md-4"><label class="form-label" for="certificateType">Certificate type</label>
+                <select class="form-select" id="certificateType" th:field="*{certificateType}">
+                    <option th:each="t : ${types}" th:value="${t}" th:text="${t.label}">Type</option>
+                </select>
+                <div class="text-danger small" th:if="${#fields.hasErrors('certificateType')}" th:errors="*{certificateType}">error</div></div>
+            <div class="col-md-6"><label class="form-label" for="institution">Institution</label>
+                <input class="form-control" id="institution" th:value="${institutionName}" readonly>
+                <div class="form-text text-muted">Certificates are issued in the name of your institution.</div></div>
+            <div class="col-md-3"><label class="form-label" for="issueDate">Issue date</label>
+                <input class="form-control" id="issueDate" type="date" th:field="*{issueDate}" th:attr="max=${today}">
+                <div class="text-danger small" th:if="${#fields.hasErrors('issueDate')}" th:errors="*{issueDate}">error</div></div>
+            <div class="col-md-3"><label class="form-label" for="expiryDate">Expiry date <span class="text-muted">(optional)</span></label>
+                <input class="form-control" id="expiryDate" type="date" th:field="*{expiryDate}">
+                <div class="text-danger small" th:if="${#fields.hasErrors('expiryDate')}" th:errors="*{expiryDate}">error</div></div>
+            <div class="col-md-4"><label class="form-label" for="grade">Grade / Score <span class="text-muted">(optional)</span></label>
+                <input class="form-control" id="grade" th:field="*{grade}" maxlength="60">
+                <div class="text-danger small" th:if="${#fields.hasErrors('grade')}" th:errors="*{grade}">error</div></div>
+            <div class="col-md-8"><label class="form-label" for="additionalInfo">Additional information <span class="text-muted">(optional)</span></label>
+                <textarea class="form-control" id="additionalInfo" rows="2" th:field="*{additionalInfo}" maxlength="1000"></textarea>
+                <div class="text-danger small" th:if="${#fields.hasErrors('additionalInfo')}" th:errors="*{additionalInfo}">error</div></div>
+        </div>
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-glow" type="submit" data-loading><i class="bi bi-patch-check"></i> Issue certificate</button>
+            <a class="btn btn-ghost" th:href="@{/issuer/dashboard}">Cancel</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

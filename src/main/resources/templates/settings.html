@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/dash :: dash(~{::title}, 'settings', ~{::main})}">
+<head><title>Settings | CertiTrust</title></head>
+<body>
+<main>
+    <div class="mb-4"><h1 class="h3 mb-0">Settings</h1><div class="text-muted">Your profile and password.</div></div>
+    <div class="row g-3">
+        <div class="col-lg-6"><div class="glass panel">
+            <h5>Profile</h5>
+            <dl class="kv mb-3">
+                <dt>Email</dt><dd th:text="${user.email}">mail</dd>
+                <dt>Role</dt><dd th:text="${user.role}">ROLE</dd>
+                <dt th:if="${user.institution != null}">Institution</dt><dd th:if="${user.institution != null}" th:text="${user.institution.name}">Institution</dd>
+                <dt>Member since</dt><dd th:text="${#temporals.format(user.createdAt, 'dd MMM yyyy')}">date</dd>
+            </dl>
+            <form th:action="@{/settings/profile}" method="post">
+                <label class="form-label" for="name">Display name</label>
+                <div class="input-group"><input class="form-control" id="name" name="name" th:value="${user.name}" maxlength="100" required>
+                    <button class="btn btn-glow" type="submit">Save</button></div>
+            </form>
+        </div></div>
+        <div class="col-lg-6"><div class="glass panel">
+            <h5>Change password</h5>
+            <form th:action="@{/settings/password}" th:object="${passwordForm}" method="post" novalidate>
+                <div class="mb-3"><label class="form-label" for="currentPassword">Current password</label>
+                    <input class="form-control" id="currentPassword" type="password" th:field="*{currentPassword}" autocomplete="current-password">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}">error</div></div>
+                <div class="mb-3"><label class="form-label" for="newPassword">New password</label>
+                    <input class="form-control" id="newPassword" type="password" th:field="*{newPassword}" autocomplete="new-password">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}">error</div></div>
+                <div class="mb-3"><label class="form-label" for="confirmPassword">Confirm new password</label>
+                    <input class="form-control" id="confirmPassword" type="password" th:field="*{confirmPassword}" autocomplete="new-password">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}">error</div></div>
+                <button class="btn btn-glow" type="submit" data-loading><i class="bi bi-key"></i> Change password</button>
+            </form>
+        </div></div>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/dash :: dash(~{::title}, 'history', ~{::main})}">
+<head><title>Verification History | CertiTrust</title></head>
+<body>
+<main>
+    <div class="mb-4"><h1 class="h3 mb-0">Verification history</h1><div class="text-muted" th:text="${scope}">scope</div></div>
+    <div class="glass panel">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead><tr><th>Time</th><th>Certificate ID</th><th>Result</th><th>Verified by</th><th th:if="${showIp}">IP address</th></tr></thead>
+                <tbody>
+                <tr th:each="l : ${page.content}">
+                    <td class="text-nowrap" th:text="${#temporals.format(l.verificationTime, 'dd MMM yyyy, HH:mm:ss')}">time</td>
+                    <td><a th:href="@{/certificate/{id}(id=${l.certificateId})}" th:text="${l.certificateId}">ID</a></td>
+                    <td><span class="badge-soft" th:classappend="'badge-' + ${l.verificationStatus}" th:text="${l.verificationStatus}">VERIFIED</span></td>
+                    <td th:text="${l.verifier != null ? l.verifier.name : 'Anonymous'}">Anonymous</td>
+                    <td th:if="${showIp}" th:text="${l.ipAddress != null ? l.ipAddress : '-'}">ip</td>
+                </tr>
+                <tr th:if="${page.empty}"><td th:colspan="${showIp ? 5 : 4}" class="text-center text-muted py-4">No verifications yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:replace="~{fragments/common :: pager(${page}, '/history')}"></div>
+    </div>
+</main>
+</body>
+</html>

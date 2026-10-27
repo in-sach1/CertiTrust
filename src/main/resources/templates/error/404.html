@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/public :: pub(~{::title}, ~{::main})}">
+<head><title>404 - Page not found | CertiTrust</title></head>
+<body>
+<main class="container text-center py-5" style="max-width:640px">
+    <div class="error-code text-gradient">404</div>
+    <h1 class="h3 mt-3">Page not found</h1>
+    <p class="text-muted">The page or certificate you are looking for does not exist or has been moved.</p>
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        <a class="btn btn-glow" th:href="@{/}"><i class="bi bi-house"></i> Home</a>
+        <a class="btn btn-ghost" th:href="@{/verify}"><i class="bi bi-qr-code-scan"></i> Verify a certificate</a>
+    </div>
+</main>
+</body>
+</html>

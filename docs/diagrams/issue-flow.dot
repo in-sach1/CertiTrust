@@ -1,0 +1,27 @@
+digraph Flow {
+  graph [rankdir=TB fontname="Helvetica" nodesep=0.5 ranksep=0.45 labelloc=t label=<<B>Certificate issuing workflow</B>> fontsize=18 pad=0.4 bgcolor=white];
+  node [fontname="Helvetica" fontsize=11 style="rounded,filled" shape=box fillcolor="#dbeafe" color="#1e3a8a"];
+  edge [fontname="Helvetica" fontsize=10];
+  a [label="Issuer logs in" shape=ellipse fillcolor="#e9d5ff" color="#6b21a8"];
+  b [label="Fills the issue form"];
+  c [label="Input valid?\n(dates, e-mail, institution active)" shape=diamond style=filled fillcolor="#fde68a" color="#92400e"];
+  x [label="Show error message\n(InvalidInputException)" fillcolor="#fecaca" color="#991b1b"];
+  d [label="Save record with temporary ID"];
+  e [label="Create ID  CERT-YYYY-NNNNNN"];
+  f [label="Compute SHA-256 hash of the data"];
+  g [label="Generate QR code (verification URL)"];
+  h [label="Generate PDF certificate"];
+  i [label="Save record + write audit log"];
+  j [label="Show certificate page\nwith Download / Verify / Print" fillcolor="#bbf7d0" color="#166534"];
+  a -> b;
+  b -> c;
+  c -> x [label="no"];
+  x -> b [label="fix"];
+  c -> d [label="yes"];
+  d -> e;
+  e -> f;
+  f -> g;
+  g -> h;
+  h -> i;
+  i -> j;
+}

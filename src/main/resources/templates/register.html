@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/public :: pub(~{::title}, ~{::main})}">
+<head><title>Register | CertiTrust</title></head>
+<body>
+<main class="container pb-5" style="max-width:560px">
+    <div class="text-center mb-4">
+        <h1 class="section-title">Create your <span class="text-gradient">account</span></h1>
+        <p class="text-muted">Join CertiTrust as an issuer or a verifier.</p>
+    </div>
+    <form class="glass p-4" th:action="@{/register}" th:object="${form}" method="post" novalidate>
+        <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}">
+            <div th:each="e : ${#fields.globalErrors()}" th:text="${e}">error</div>
+        </div>
+        <div class="mb-3"><label class="form-label" for="name">Full name</label>
+            <input class="form-control" id="name" th:field="*{name}" maxlength="100" autocomplete="name">
+            <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">error</div></div>
+        <div class="mb-3"><label class="form-label" for="email">Email</label>
+            <input class="form-control" id="email" type="email" th:field="*{email}" maxlength="150" autocomplete="email">
+            <div class="text-danger small" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">error</div></div>
+        <div class="row">
+            <div class="col-md-6 mb-3"><label class="form-label" for="password">Password</label>
+                <input class="form-control" id="password" type="password" th:field="*{password}" autocomplete="new-password">
+                <div class="text-danger small" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">error</div></div>
+            <div class="col-md-6 mb-3"><label class="form-label" for="confirmPassword">Confirm password</label>
+                <input class="form-control" id="confirmPassword" type="password" th:field="*{confirmPassword}" autocomplete="new-password">
+                <div class="text-danger small" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}">error</div></div>
+        </div>
+        <div class="mb-3"><label class="form-label" for="role">I am registering as</label>
+            <select class="form-select" id="role" th:field="*{role}">
+                <option value="VERIFIER">Verifier - employer / recruiter (check certificates)</option>
+                <option value="ISSUER">Issuer - institution (issue certificates)</option>
+            </select>
+            <div class="text-danger small" th:if="${#fields.hasErrors('role')}" th:errors="*{role}">error</div></div>
+        <div class="mb-3 institution-row">
+            <label class="form-label" for="institutionName">Institution name</label>
+            <input class="form-control" id="institutionName" th:field="*{institutionName}" maxlength="150">
+            <div class="form-text text-muted">Issuer accounts are activated after an administrator approves them.</div>
+            <div class="text-danger small" th:if="${#fields.hasErrors('institutionName')}" th:errors="*{institutionName}">error</div></div>
+        <div class="small text-muted mb-3">Administrator accounts cannot be self-registered - an existing administrator creates them.</div>
+        <button class="btn btn-glow btn-lg w-100" type="submit" data-loading><i class="bi bi-person-plus"></i> Register</button>
+        <p class="text-center text-muted mt-3 mb-0">Already registered? <a th:href="@{/login}">Login</a></p>
+    </form>
+</main>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/dash :: dash(~{::title}, 'dashboard', ~{::main})}">
+<head><title>Issuer Dashboard | CertiTrust</title></head>
+<body>
+<main>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div><h1 class="h3 mb-0">Issuer dashboard</h1><div class="text-muted">Issue, track and revoke your institution's certificates.</div></div>
+        <a class="btn btn-glow" th:href="@{/issuer/issue}"><i class="bi bi-patch-plus"></i> Issue Certificate</a>
+    </div>
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3"><div class="glass kpi hover-lift"><div class="icon-box"><i class="bi bi-award"></i></div><div>
+            <div class="val" th:attr="data-count=${stats.issued}">0</div><div class="lbl">Total Certificates Issued</div><div class="trend flat">all time</div></div></div></div>
+        <div class="col-sm-6 col-xl-3"><div class="glass kpi hover-lift"><div class="icon-box"><i class="bi bi-patch-check"></i></div><div>
+            <div class="val" th:attr="data-count=${stats.verified}">0</div><div class="lbl">Certificates Verified</div><div class="trend up"><i class="bi bi-graph-up-arrow"></i> verification checks</div></div></div></div>
+        <div class="col-sm-6 col-xl-3"><div class="glass kpi hover-lift"><div class="icon-box"><i class="bi bi-shield-check"></i></div><div>
+            <div class="val" th:attr="data-count=${stats.active}">0</div><div class="lbl">Active Certificates</div><div class="trend up">valid now</div></div></div></div>
+        <div class="col-sm-6 col-xl-3"><div class="glass kpi hover-lift"><div class="icon-box"><i class="bi bi-slash-circle"></i></div><div>
+            <div class="val" th:attr="data-count=${stats.revoked}">0</div><div class="lbl">Revoked Certificates</div><div class="trend down" th:text="${stats.expired} + ' expired'">0 expired</div></div></div></div>
+    </div>
+    <div class="row g-3">
+        <div class="col-lg-5"><div class="glass panel h-100"><h5>Certificate status</h5><div class="chart-box"><canvas id="statusChart"></canvas></div></div></div>
+        <div class="col-lg-7"><div class="glass panel h-100">
+            <div class="d-flex justify-content-between"><h5>Recent verification activity</h5><a th:href="@{/history}" class="small">View all</a></div>
+            <p class="text-muted small" th:if="${#lists.isEmpty(recent)}">Nobody has verified your certificates yet.</p>
+            <ul class="activity"><li th:each="n : ${recent}"><i class="bi bi-activity"></i><div><span th:text="${n.text}">item</span><br><small th:text="${#temporals.format(n.time, 'dd MMM yyyy, HH:mm')}">time</small></div></li></ul>
+        </div></div>
+    </div>
+    <script th:inline="javascript">
+    (function () {
+        var s = /*[[${stats}]]*/ {};
+        Chart.defaults.color = '#93a4c3';
+        Chart.defaults.borderColor = 'rgba(255,255,255,.08)';
+        new Chart(document.getElementById('statusChart'), {
+            type: 'doughnut',
+            data: { labels: ['Active', 'Revoked', 'Expired'],
+                    datasets: [{ data: [s.active, s.revoked, s.expired], backgroundColor: ['#22c55e', '#ef4444', '#f59e0b'], borderWidth: 0 }] },
+            options: { maintainAspectRatio: false, cutout: '68%', plugins: { legend: { position: 'bottom' } } }
+        });
+    })();
+    </script>
+</main>
+</body>
+</html>

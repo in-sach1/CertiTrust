@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/dash :: dash(~{::title}, 'certs', ~{::main})}">
+<head><title>Certificates | CertiTrust</title></head>
+<body>
+<main>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div><h1 class="h3 mb-0" th:text="${heading}">Certificates</h1>
+            <div class="text-muted"><span th:text="${page.totalElements}">0</span> certificate(s) found</div></div>
+        <a class="btn btn-glow" th:if="${mode == 'ISSUER'}" th:href="@{/issuer/issue}"><i class="bi bi-patch-plus"></i> Issue Certificate</a>
+    </div>
+
+    <form class="glass panel mb-3" th:action="@{${basePath}}" method="get">
+        <div class="row g-2 align-items-end">
+            <div class="col-lg-4"><label class="form-label" for="q">Search</label>
+                <input class="form-control" id="q" name="q" th:value="${q}" placeholder="Certificate ID, recipient, course or institution"></div>
+            <div class="col-6 col-lg-2"><label class="form-label" for="filter">Status</label>
+                <select class="form-select" id="filter" name="filter">
+                    <option value="ALL" th:selected="${filter == 'ALL'}">All</option>
+                    <option value="VALID" th:selected="${filter == 'VALID'}">Valid</option>
+                    <option value="REVOKED" th:selected="${filter == 'REVOKED'}">Revoked</option>
+                    <option value="EXPIRED" th:selected="${filter == 'EXPIRED'}">Expired</option>
+                </select></div>
+            <div class="col-6 col-lg-2"><label class="form-label" for="type">Type</label>
+                <select class="form-select" id="type" name="type">
+                    <option value="">All types</option>
+                    <option th:each="t : ${types}" th:value="${t}" th:text="${t.label}" th:selected="${type == t}">Type</option>
+                </select></div>
+            <div class="col-6 col-lg-2"><label class="form-label" for="from">Issued from</label>
+                <input class="form-control" type="date" id="from" name="from" th:value="${from}"></div>
+            <div class="col-6 col-lg-2"><label class="form-label" for="to">Issued to</label>
+                <input class="form-control" type="date" id="to" name="to" th:value="${to}"></div>
+        </div>
+        <div class="d-flex gap-2 mt-3">
+            <input type="hidden" name="sort" th:value="${sort}"><input type="hidden" name="dir" th:value="${dir}">
+            <button class="btn btn-glow" type="submit"><i class="bi bi-search"></i> Search</button>
+            <a class="btn btn-ghost" th:href="@{${basePath}}" title="Reset filters"><i class="bi bi-x-lg"></i> Reset</a>
+        </div>
+    </form>
+
+    <div class="glass panel">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead><tr>
+                    <th><a th:href="@{${basePath}(q=${q}, filter=${filter}, type=${type}, from=${from}, to=${to}, sort='certificateId', dir=${sort == 'certificateId' and dir == 'asc' ? 'desc' : 'asc'})}">Certificate ID <i class="bi bi-arrow-down-up small"></i></a></th>
+                    <th><a th:href="@{${basePath}(q=${q}, filter=${filter}, type=${type}, from=${from}, to=${to}, sort='recipientName', dir=${sort == 'recipientName' and dir == 'asc' ? 'desc' : 'asc'})}">Recipient <i class="bi bi-arrow-down-up small"></i></a></th>
+                    <th><a th:href="@{${basePath}(q=${q}, filter=${filter}, type=${type}, from=${from}, to=${to}, sort='course', dir=${sort == 'course' and dir == 'asc' ? 'desc' : 'asc'})}">Course <i class="bi bi-arrow-down-up small"></i></a></th>
+                    <th><a th:href="@{${basePath}(q=${q}, filter=${filter}, type=${type}, from=${from}, to=${to}, sort='issueDate', dir=${sort == 'issueDate' and dir == 'asc' ? 'desc' : 'asc'})}">Issue Date <i class="bi bi-arrow-down-up small"></i></a></th>
+                    <th><a th:href="@{${basePath}(q=${q}, filter=${filter}, type=${type}, from=${from}, to=${to}, sort='status', dir=${sort == 'status' and dir == 'asc' ? 'desc' : 'asc'})}">Status <i class="bi bi-arrow-down-up small"></i></a></th>
+                    <th><a th:href="@{${basePath}(q=${q}, filter=${filter}, type=${type}, from=${from}, to=${to}, sort='verificationCount', dir=${sort == 'verificationCount' and dir == 'asc' ? 'desc' : 'asc'})}">Verifications <i class="bi bi-arrow-down-up small"></i></a></th>
+                    <th class="text-end">Actions</th>
+                </tr></thead>
+                <tbody>
+                <tr th:each="c : ${page.content}">
+                    <td><a th:href="@{/certificate/{id}(id=${c.certificateId})}" th:text="${c.certificateId}">CERT</a></td>
+                    <td th:text="${c.recipientName}">Name</td>
+                    <td th:text="${c.course}">Course</td>
+                    <td th:text="${#temporals.format(c.issueDate, 'dd MMM yyyy')}">date</td>
+                    <td><span class="badge-soft" th:classappend="'badge-' + ${c.displayStatus}" th:text="${c.displayStatus}">VALID</span></td>
+                    <td th:text="${c.verificationCount}">0</td>
+                    <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-ghost" th:href="@{/certificate/{id}(id=${c.certificateId})}" title="View"><i class="bi bi-eye"></i></a>
+                        <a class="btn btn-sm btn-ghost" th:href="@{/certificate/{id}/download(id=${c.certificateId})}" title="Download PDF"><i class="bi bi-download"></i></a>
+                        <a class="btn btn-sm btn-ghost" th:href="@{/verify(certificateId=${c.certificateId})}" title="Verify"><i class="bi bi-shield-check"></i></a>
+                        <button type="button" class="btn btn-sm btn-outline-danger" title="Revoke"
+                                th:if="${mode != 'VERIFIER' and c.status.name() == 'ACTIVE'}"
+                                data-bs-toggle="modal" data-bs-target="#revokeModal" th:attr="data-cert=${c.certificateId}"><i class="bi bi-slash-circle"></i></button>
+                    </td>
+                </tr>
+                <tr th:if="${page.empty}"><td colspan="7" class="text-center text-muted py-4">No certificates match your search.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <nav th:if="${page.totalPages > 1}" class="mt-3" aria-label="Pages">
+            <ul class="pagination pagination-sm justify-content-center mb-0 flex-wrap">
+                <li class="page-item" th:classappend="${page.first ? 'disabled' : ''}"><a class="page-link" th:href="@{${basePath}(page=${page.number - 1}, q=${q}, filter=${filter}, type=${type}, from=${from}, to=${to}, sort=${sort}, dir=${dir})}">Previous</a></li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" th:classappend="${i == page.number ? 'active' : ''}"><a class="page-link" th:href="@{${basePath}(page=${i}, q=${q}, filter=${filter}, type=${type}, from=${from}, to=${to}, sort=${sort}, dir=${dir})}" th:text="${i + 1}">1</a></li>
+                <li class="page-item" th:classappend="${page.last ? 'disabled' : ''}"><a class="page-link" th:href="@{${basePath}(page=${page.number + 1}, q=${q}, filter=${filter}, type=${type}, from=${from}, to=${to}, sort=${sort}, dir=${dir})}">Next</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Revoke modal: JS (app.js) sets the form action for the clicked certificate -->
+    <div class="modal fade" id="revokeModal" tabindex="-1" aria-hidden="true" th:if="${mode != 'VERIFIER'}">
+        <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+            <form id="revokeForm" method="post" th:action="@{/manage/certificates/pending/revoke}">
+                <input type="hidden" name="from" th:value="${mode == 'ADMIN' ? 'admin' : 'issuer'}">
+                <div class="modal-header"><h5 class="modal-title">Revoke <span id="revokeCertLabel"></span></h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <p class="text-muted">The certificate stays in the database, but verification will show it as <strong>revoked</strong> with your reason.</p>
+                    <label class="form-label" for="reason">Reason for revocation</label>
+                    <textarea class="form-control" id="reason" name="reason" rows="3" maxlength="500" required></textarea>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-danger">Revoke certificate</button></div>
+            </form>
+        </div></div>
+    </div>
+</main>
+</body>
+</html>

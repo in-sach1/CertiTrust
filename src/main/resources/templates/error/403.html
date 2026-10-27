@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/public :: pub(~{::title}, ~{::main})}">
+<head><title>403 - Access denied | CertiTrust</title></head>
+<body>
+<main class="container text-center py-5" style="max-width:640px">
+    <div class="error-code text-gradient">403</div>
+    <h1 class="h3 mt-3">Access denied</h1>
+    <p class="text-muted">Your account does not have permission to open this page.</p>
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        <a class="btn btn-glow" th:href="@{/dashboard}"><i class="bi bi-grid-1x2"></i> My dashboard</a>
+        <a class="btn btn-ghost" th:href="@{/}">Home</a>
+    </div>
+</main>
+</body>
+</html>

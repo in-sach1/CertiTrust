@@ -1,0 +1,22 @@
+digraph G {
+  graph [rankdir=BT fontname="Helvetica" nodesep=0.4 ranksep=0.8 labelloc=t label=<<B>CertiTrust - UML class diagram (2/3: interfaces, services, exceptions)</B>> fontsize=20 pad=0.4 bgcolor=white ];
+  node [fontname="Helvetica" fontsize=11];
+  edge [fontname="Helvetica" fontsize=10];
+  COps [shape=plaintext label=<<TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" BGCOLOR="white"><TR><TD BGCOLOR="#fbcfe8"><FONT POINT-SIZE="10">&laquo;interface&raquo;</FONT><BR/><B>CertificateOperations</B></TD></TR><TR><TD ALIGN="LEFT" BALIGN="LEFT">+ issue(request, issuerId, ip): Certificate<BR ALIGN="LEFT"/>+ update(id, request, actorId, ip): Certificate<BR ALIGN="LEFT"/>+ revoke(id, reason, actorId, ip): void<BR ALIGN="LEFT"/>+ getByCertificateId(id): Certificate<BR ALIGN="LEFT"/>+ search(issuerId, criteria, size): Page<BR ALIGN="LEFT"/>+ search(String keyword): List<BR ALIGN="LEFT"/>+ search(CertificateType type): List<BR ALIGN="LEFT"/>+ search(LocalDate from, LocalDate to): List<BR ALIGN="LEFT"/></TD></TR></TABLE>>];
+  VOps [shape=plaintext label=<<TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" BGCOLOR="white"><TR><TD BGCOLOR="#fbcfe8"><FONT POINT-SIZE="10">&laquo;interface&raquo;</FONT><BR/><B>VerificationOperations</B></TD></TR><TR><TD ALIGN="LEFT" BALIGN="LEFT">+ verify(id, verifierId, ip): VerificationResult<BR ALIGN="LEFT"/>+ verify(id): VerificationResult<BR ALIGN="LEFT"/>+ isAuthentic(Certificate): boolean<BR ALIGN="LEFT"/></TD></TR></TABLE>>];
+  CSvc [shape=plaintext label=<<TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" BGCOLOR="white"><TR><TD BGCOLOR="#bfdbfe"><B>CertificateService</B></TD></TR><TR><TD ALIGN="LEFT" BALIGN="LEFT">- certificates: CertificateRepository<BR ALIGN="LEFT"/>- revocations: RevocationRepository<BR ALIGN="LEFT"/>- logs: VerificationLogRepository<BR ALIGN="LEFT"/></TD></TR><TR><TD ALIGN="LEFT" BALIGN="LEFT">+ computeHash(Certificate): String<BR ALIGN="LEFT"/>+ integrityOk(Certificate): boolean<BR ALIGN="LEFT"/></TD></TR></TABLE>>];
+  RSvc [shape=plaintext label=<<TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" BGCOLOR="white"><TR><TD BGCOLOR="#bfdbfe"><B>ReportService</B></TD></TR><TR><TD ALIGN="LEFT" BALIGN="LEFT">+ platformReport(): Map&lt;String,Object&gt;<BR ALIGN="LEFT"/>  uses List, Set, EnumMap, TreeMap<BR ALIGN="LEFT"/></TD></TR></TABLE>>];
+  BEx [shape=plaintext label=<<TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" BGCOLOR="white"><TR><TD BGCOLOR="#fecaca"><B>BusinessException</B></TD></TR></TABLE>>];
+  IIE [shape=plaintext label=<<TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" BGCOLOR="white"><TR><TD BGCOLOR="#fecaca"><B>InvalidInputException</B></TD></TR></TABLE>>];
+  ICE [shape=plaintext label=<<TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" BGCOLOR="white"><TR><TD BGCOLOR="#fecaca"><B>InvalidCertificateIdException</B></TD></TR></TABLE>>];
+  RNF [shape=plaintext label=<<TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" BGCOLOR="white"><TR><TD BGCOLOR="#fecaca"><B>ResourceNotFoundException</B></TD></TR></TABLE>>];
+  CNF [shape=plaintext label=<<TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" BGCOLOR="white"><TR><TD BGCOLOR="#fecaca"><B>CertificateNotFoundException</B></TD></TR></TABLE>>];
+  CSvc -> COps [style=dashed arrowhead=empty];
+  CSvc -> VOps [style=dashed arrowhead=empty];
+  IIE -> BEx [arrowhead=empty];
+  ICE -> BEx [arrowhead=empty];
+  CNF -> RNF [arrowhead=empty];
+  CSvc -> ICE [style=dotted arrowhead=vee label="throws" constraint=false];
+  CSvc -> CNF [style=dotted arrowhead=vee label="throws" constraint=false];
+  CSvc -> IIE [style=dotted arrowhead=vee label="throws" constraint=false];
+}

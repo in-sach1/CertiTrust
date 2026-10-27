@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html th:fragment="dash(title, active, content)" lang="en" data-bs-theme="dark"
+      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:replace="${title}">CertiTrust</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/img/logo.svg}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body th:with="me=${#authentication.principal}, notes=${@dashboardService.recentActivity(me, 5)}">
+<div class="dash-wrap">
+
+    <!-- Sidebar (an off-canvas drawer on phones and tablets) -->
+    <aside class="sidebar offcanvas-lg offcanvas-start" tabindex="-1" id="sidebar">
+        <div class="offcanvas-header d-lg-none">
+            <span class="brand-mark">Certi<span class="text-gradient">Trust</span></span>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <a class="brand-mark d-none d-lg-inline-flex" th:href="@{/}"><img th:src="@{/img/logo.svg}" alt="">Certi<span class="text-gradient">Trust</span></a>
+            <ul class="side-nav">
+                <li><a th:href="@{/dashboard}" th:classappend="${active == 'dashboard' ? 'active' : ''}"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
+                <li sec:authorize="hasRole('ISSUER')"><a th:href="@{/issuer/issue}" th:classappend="${active == 'issue' ? 'active' : ''}"><i class="bi bi-patch-plus"></i> Issue Certificate</a></li>
+                <li sec:authorize="hasRole('ISSUER')"><a th:href="@{/issuer/certificates}" th:classappend="${active == 'certs' ? 'active' : ''}"><i class="bi bi-award"></i> Certificates</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/certificates}" th:classappend="${active == 'certs' ? 'active' : ''}"><i class="bi bi-award"></i> Certificates</a></li>
+                <li sec:authorize="hasRole('VERIFIER')"><a th:href="@{/verifier/certificates}" th:classappend="${active == 'certs' ? 'active' : ''}"><i class="bi bi-search"></i> Search Certificates</a></li>
+                <li><a th:href="@{/verify}"><i class="bi bi-qr-code-scan"></i> Verify Certificate</a></li>
+                <li><a th:href="@{/history}" th:classappend="${active == 'history' ? 'active' : ''}"><i class="bi bi-clock-history"></i> Verification History</a></li>
+                <li class="side-label" sec:authorize="hasRole('ADMIN')">Administration</li>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/users}" th:classappend="${active == 'users' ? 'active' : ''}"><i class="bi bi-people"></i> Users</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/institutions}" th:classappend="${active == 'institutions' ? 'active' : ''}"><i class="bi bi-building"></i> Institutions</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/reports}" th:classappend="${active == 'reports' ? 'active' : ''}"><i class="bi bi-bar-chart-line"></i> Reports</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/audit}" th:classappend="${active == 'audit' ? 'active' : ''}"><i class="bi bi-journal-text"></i> Audit Trail</a></li>
+                <li class="side-label">Account</li>
+                <li><a th:href="@{/settings}" th:classappend="${active == 'settings' ? 'active' : ''}"><i class="bi bi-gear"></i> Settings</a></li>
+                <li>
+                    <form th:action="@{/logout}" method="post" class="m-0">
+                        <button type="submit"><i class="bi bi-box-arrow-right"></i> Logout</button>
+                    </form>
+                </li>
+            </ul>
+            <div class="mt-auto small text-muted pt-4">Verify Every Credential.<br>Trust Every Certificate.</div>
+        </div>
+    </aside>
+
+    <div class="dash-main">
+        <header class="topbar">
+            <button class="btn btn-ghost d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-label="Open menu">
+                <i class="bi bi-list fs-5"></i>
+            </button>
+            <div class="me-auto text-muted small d-none d-sm-block"><i class="bi bi-shield-check text-info"></i> Secure session</div>
+
+            <div class="dropdown">
+                <button class="btn btn-ghost position-relative" type="button" data-bs-toggle="dropdown" aria-label="Notifications">
+                    <i class="bi bi-bell"></i>
+                    <span th:if="${!#lists.isEmpty(notes)}" th:text="${#lists.size(notes)}"
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end p-2" style="width:330px;max-width:90vw">
+                    <h6 class="px-2 pt-1">Notifications</h6>
+                    <div th:if="${#lists.isEmpty(notes)}" class="px-2 pb-2 small text-muted">Nothing new yet.</div>
+                    <div th:each="n : ${notes}" class="px-2 py-2 border-top small">
+                        <div th:text="${n.text}">activity</div>
+                        <div class="text-muted" th:text="${#temporals.format(n.time, 'dd MMM yyyy, HH:mm')}">time</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <button class="btn btn-ghost d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle fs-5"></i>
+                    <span class="d-none d-sm-inline text-start lh-sm">
+                        <span class="d-block" th:text="${me.name}">User</span>
+                        <small class="text-muted" th:text="${me.role}">ROLE</small>
+                    </span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><span class="dropdown-item-text small text-muted" th:text="${me.email}">email</span></li>
+                    <li><a class="dropdown-item" th:href="@{/settings}"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                    <li><a class="dropdown-item" th:href="@{/}"><i class="bi bi-house me-2"></i>Public website</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form th:action="@{/logout}" method="post" class="m-0">
+                            <button class="dropdown-item" type="submit"><i class="bi bi-box-arrow-right me-2"></i>Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </header>
+
+        <div class="dash-content">
+            <div th:replace="~{fragments/common :: flash}"></div>
+            <div th:replace="${content}"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

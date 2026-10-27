@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/dash :: dash(~{::title}, 'dashboard', ~{::main})}">
+<head><title>Admin Dashboard | CertiTrust</title></head>
+<body>
+<main>
+    <div class="mb-4"><h1 class="h3 mb-0">Administrator dashboard</h1><div class="text-muted">Platform overview, activity and trends.</div></div>
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl"><div class="glass kpi hover-lift"><div class="icon-box"><i class="bi bi-people"></i></div><div>
+            <div class="val" th:attr="data-count=${stats.users}">0</div><div class="lbl">Users</div></div></div></div>
+        <div class="col-sm-6 col-xl"><div class="glass kpi hover-lift"><div class="icon-box"><i class="bi bi-award"></i></div><div>
+            <div class="val" th:attr="data-count=${stats.certificates}">0</div><div class="lbl">Certificates</div></div></div></div>
+        <div class="col-sm-6 col-xl"><div class="glass kpi hover-lift"><div class="icon-box"><i class="bi bi-slash-circle"></i></div><div>
+            <div class="val" th:attr="data-count=${stats.revoked}">0</div><div class="lbl">Revoked</div></div></div></div>
+        <div class="col-sm-6 col-xl"><div class="glass kpi hover-lift"><div class="icon-box"><i class="bi bi-building"></i></div><div>
+            <div class="val" th:attr="data-count=${stats.institutions}">0</div><div class="lbl">Active institutions</div></div></div></div>
+        <div class="col-sm-6 col-xl"><div class="glass kpi hover-lift"><div class="icon-box"><i class="bi bi-patch-check"></i></div><div>
+            <div class="val" th:attr="data-count=${stats.verifications}">0</div><div class="lbl">Verifications</div></div></div></div>
+    </div>
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6"><div class="glass panel"><h5>Certificates issued over time</h5><div class="chart-box"><canvas id="issuedChart"></canvas></div></div></div>
+        <div class="col-lg-6"><div class="glass panel"><h5>Certificates verified over time</h5><div class="chart-box"><canvas id="verifiedChart"></canvas></div></div></div>
+    </div>
+    <div class="row g-3">
+        <div class="col-md-6 col-lg-3"><div class="glass panel"><h5>Valid vs revoked</h5><div class="chart-box"><canvas id="statusChart"></canvas></div></div></div>
+        <div class="col-md-6 col-lg-3"><div class="glass panel"><h5>Users by role</h5><div class="chart-box"><canvas id="usersChart"></canvas></div></div></div>
+        <div class="col-lg-6"><div class="glass panel h-100">
+            <div class="d-flex justify-content-between"><h5>Recent activity</h5><a th:href="@{/admin/audit}" class="small">Audit trail</a></div>
+            <ul class="activity"><li th:each="n : ${recent}"><i class="bi bi-activity"></i><div><span th:text="${n.text}">item</span><br><small th:text="${#temporals.format(n.time, 'dd MMM yyyy, HH:mm')}">time</small></div></li></ul>
+        </div></div>
+    </div>
+    <script th:inline="javascript">
+    (function () {
+        var c = /*[[${charts}]]*/ {};
+        Chart.defaults.color = '#93a4c3';
+        Chart.defaults.borderColor = 'rgba(255,255,255,.08)';
+        var axes = { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } };
+        function line(id, label, data, color, fill) {
+            new Chart(document.getElementById(id), { type: 'line',
+                data: { labels: c.months, datasets: [{ label: label, data: data, borderColor: color, backgroundColor: fill, fill: true, tension: 0.35, pointRadius: 4 }] },
+                options: axes });
+        }
+        function ring(id, labels, data, colors) {
+            new Chart(document.getElementById(id), { type: 'doughnut',
+                data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 0 }] },
+                options: { maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom' } } } });
+        }
+        line('issuedChart', 'Issued', c.issued, '#22d3ee', 'rgba(34,211,238,.15)');
+        line('verifiedChart', 'Verified', c.verified, '#8b5cf6', 'rgba(139,92,246,.15)');
+        ring('statusChart', c.statusLabels, c.statusCounts, ['#22c55e', '#ef4444', '#f59e0b']);
+        ring('usersChart', c.userLabels, c.userCounts, ['#8b5cf6', '#22d3ee', '#3b82f6']);
+    })();
+    </script>
+</main>
+</body>
+</html>

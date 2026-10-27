@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/public :: pub(~{::title}, ~{::main})}">
+<head><title>CertiTrust - Verify. Trust. Authenticate.</title></head>
+<body>
+<main>
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span class="kicker"><i class="bi bi-shield-check"></i> Trust Every Credential.</span>
+                    <h1 class="mt-3 mb-3">Verify. Trust. <span class="text-gradient">Authenticate.</span></h1>
+                    <p class="lead text-muted mb-4">Instantly verify digital certificates and protect credentials from fraud.</p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a class="btn btn-glow btn-lg px-4" th:href="@{/verify}"><i class="bi bi-qr-code-scan me-1"></i> Verify Certificate</a>
+                        <a class="btn btn-ghost btn-lg px-4" th:href="@{/register}">Get Started <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                    <div class="d-flex flex-wrap gap-4 mt-4 text-muted small">
+                        <span><i class="bi bi-lock-fill text-info"></i> SHA-256 sealed</span>
+                        <span><i class="bi bi-qr-code text-info"></i> QR verification</span>
+                        <span><i class="bi bi-person-check-fill text-info"></i> Role-based access</span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-visual">
+                        <div class="cert-card">
+                            <div class="scan-beam"></div>
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="cert-seal"><i class="bi bi-patch-check-fill"></i></div>
+                                <div class="flex-grow-1"><div class="cert-line" style="width:70%"></div><div class="cert-line" style="width:45%;opacity:.6"></div></div>
+                            </div>
+                            <div class="fw-bold fs-5 mb-1">Certificate of Excellence</div>
+                            <div class="text-muted small mb-3">Digitally signed &middot; Hash-protected</div>
+                            <div class="cert-line" style="width:90%"></div><div class="cert-line" style="width:75%"></div><div class="cert-line" style="width:82%"></div>
+                            <div class="d-flex justify-content-between align-items-end mt-3">
+                                <div class="small text-muted">CERT-2026-000123<br><span class="hash">9f2c7a…b81e</span></div>
+                                <div class="qr-mini" aria-hidden="true"></div>
+                            </div>
+                        </div>
+                        <div class="float-chip c1"><i class="bi bi-check-circle-fill"></i> Authentic</div>
+                        <div class="float-chip c2"><i class="bi bi-shield-lock-fill"></i> Tamper-proof</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VERIFICATION ANIMATION -->
+    <section class="section">
+        <div class="container reveal">
+            <div class="text-center mb-4">
+                <h2 class="section-title">Trust every credential in <span class="text-gradient">seconds</span></h2>
+            </div>
+            <div class="flow">
+                <div class="flow-node"><i class="bi bi-file-earmark-text"></i><strong>Certificate</strong></div>
+                <div class="flow-arrow"><i class="bi bi-arrow-right"></i></div>
+                <div class="flow-node"><i class="bi bi-pen"></i><strong>Digital Signature</strong></div>
+                <div class="flow-arrow"><i class="bi bi-arrow-right"></i></div>
+                <div class="flow-node"><i class="bi bi-qr-code"></i><strong>QR Verification</strong></div>
+                <div class="flow-arrow"><i class="bi bi-arrow-right"></i></div>
+                <div class="flow-node"><i class="bi bi-patch-check-fill"></i><strong>Authentic &#10003;</strong></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <span class="kicker">How it works</span>
+                <h2 class="section-title mt-3">Four steps from issue to <span class="text-gradient">trust</span></h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3 reveal"><div class="glass step hover-lift"><div class="step-num">1</div>
+                    <div class="icon-box"><i class="bi bi-patch-plus"></i></div><h5>Certificate Issued</h5>
+                    <p class="text-muted mb-0">An authorised issuer creates the certificate for a recipient.</p></div></div>
+                <div class="col-md-6 col-lg-3 reveal"><div class="glass step hover-lift"><div class="step-num">2</div>
+                    <div class="icon-box"><i class="bi bi-shield-lock"></i></div><h5>Certificate Digitally Secured</h5>
+                    <p class="text-muted mb-0">A SHA-256 fingerprint of the data is stored and checked on every verification.</p></div></div>
+                <div class="col-md-6 col-lg-3 reveal"><div class="glass step hover-lift"><div class="step-num">3</div>
+                    <div class="icon-box"><i class="bi bi-qr-code"></i></div><h5>QR Code Generated</h5>
+                    <p class="text-muted mb-0">A unique QR code and a PDF certificate are created automatically.</p></div></div>
+                <div class="col-md-6 col-lg-3 reveal"><div class="glass step hover-lift"><div class="step-num">4</div>
+                    <div class="icon-box"><i class="bi bi-patch-check"></i></div><h5>Certificate Verified</h5>
+                    <p class="text-muted mb-0">Anyone can scan or enter the ID and see the result instantly.</p></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <span class="kicker">Platform features</span>
+                <h2 class="section-title mt-3">Everything you need to fight <span class="text-gradient">certificate fraud</span></h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-sm-6 col-lg-3 reveal"><div class="glass feature hover-lift"><div class="icon-box"><i class="bi bi-lightning-charge"></i></div><h5>Instant Verification</h5><p class="text-muted mb-0">Check any certificate by ID in a single click - no account needed.</p></div></div>
+                <div class="col-sm-6 col-lg-3 reveal"><div class="glass feature hover-lift"><div class="icon-box"><i class="bi bi-qr-code-scan"></i></div><h5>QR Code Verification</h5><p class="text-muted mb-0">Scan the code on a certificate with a phone camera to open the result.</p></div></div>
+                <div class="col-sm-6 col-lg-3 reveal"><div class="glass feature hover-lift"><div class="icon-box"><i class="bi bi-shield-lock"></i></div><h5>Secure Digital Certificates</h5><p class="text-muted mb-0">Every certificate carries a cryptographic hash that exposes tampering.</p></div></div>
+                <div class="col-sm-6 col-lg-3 reveal"><div class="glass feature hover-lift"><div class="icon-box"><i class="bi bi-patch-check"></i></div><h5>Certificate Issuance</h5><p class="text-muted mb-0">Issue certificates and download professional PDFs in seconds.</p></div></div>
+                <div class="col-sm-6 col-lg-3 reveal"><div class="glass feature hover-lift"><div class="icon-box"><i class="bi bi-shield-exclamation"></i></div><h5>Fraud Prevention</h5><p class="text-muted mb-0">Revoke certificates instantly and show the reason to every verifier.</p></div></div>
+                <div class="col-sm-6 col-lg-3 reveal"><div class="glass feature hover-lift"><div class="icon-box"><i class="bi bi-clock-history"></i></div><h5>Verification History</h5><p class="text-muted mb-0">See who checked which certificate and when, with a full audit trail.</p></div></div>
+                <div class="col-sm-6 col-lg-3 reveal"><div class="glass feature hover-lift"><div class="icon-box"><i class="bi bi-database-check"></i></div><h5>Digital Records</h5><p class="text-muted mb-0">Certificates are never deleted, so every record stays verifiable.</p></div></div>
+                <div class="col-sm-6 col-lg-3 reveal"><div class="glass feature hover-lift"><div class="icon-box"><i class="bi bi-people"></i></div><h5>Role-Based Access</h5><p class="text-muted mb-0">Admins, issuers and verifiers each see only what they should.</p></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECURITY -->
+    <section class="section">
+        <div class="container">
+            <div class="glass p-4 p-md-5 reveal">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-5">
+                        <span class="kicker">Security</span>
+                        <h2 class="section-title mt-3">Built for <span class="text-gradient">Trust</span></h2>
+                        <p class="text-muted mb-0">Security is part of the design, not an add-on.</p>
+                    </div>
+                    <div class="col-lg-7">
+                        <div class="row g-3">
+                            <div class="col-6"><i class="bi bi-key-fill text-info me-2"></i>BCrypt password hashing</div>
+                            <div class="col-6"><i class="bi bi-hash text-info me-2"></i>SHA-256 certificate hashes</div>
+                            <div class="col-6"><i class="bi bi-shield-check text-info me-2"></i>CSRF &amp; XSS protection</div>
+                            <div class="col-6"><i class="bi bi-person-lock text-info me-2"></i>Role-based authorization</div>
+                            <div class="col-6"><i class="bi bi-journal-check text-info me-2"></i>Full audit trail</div>
+                            <div class="col-6"><i class="bi bi-eye-slash text-info me-2"></i>No personal data exposed</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LIVE STATISTICS -->
+    <section class="section">
+        <div class="container">
+            <div class="row g-4 text-center">
+                <div class="col-6 col-lg-3 reveal"><div class="glass stat-card"><div class="stat-num" th:attr="data-count=${stats.issued}">0</div><div class="text-muted">Certificates Issued</div></div></div>
+                <div class="col-6 col-lg-3 reveal"><div class="glass stat-card"><div class="stat-num" th:attr="data-count=${stats.verified}">0</div><div class="text-muted">Certificates Verified</div></div></div>
+                <div class="col-6 col-lg-3 reveal"><div class="glass stat-card"><div class="stat-num" th:attr="data-count=${stats.institutions}">0</div><div class="text-muted">Registered Institutions</div></div></div>
+                <div class="col-6 col-lg-3 reveal"><div class="glass stat-card"><div class="stat-num"><span th:attr="data-count=${stats.successRate},data-decimals=1">0</span>%</div><div class="text-muted">Verification Success Rate</div></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CALL TO ACTION -->
+    <section class="section">
+        <div class="container">
+            <div class="glass cta reveal">
+                <h2 class="section-title mb-2">Have a certificate? Verify it now.</h2>
+                <p class="text-muted mb-4">Paste the certificate ID or scan its QR code - it takes a few seconds.</p>
+                <a class="btn btn-glow btn-lg px-5" th:href="@{/verify}">Verify Certificate</a>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

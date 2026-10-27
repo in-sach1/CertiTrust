@@ -1,0 +1,45 @@
+# CertiTrust configuration. Every secret / location can be overridden with an environment variable.
+server:
+  port: ${PORT:8080}
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        http-only: true
+        secure: ${SESSION_COOKIE_SECURE:false}
+        same-site: lax
+
+spring:
+  application:
+    name: certitrust
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/certitrust?createDatabaseIfNotExist=true&sslMode=PREFERRED&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: ${DB_DDL_AUTO:update}
+    open-in-view: false
+  thymeleaf:
+    cache: false
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 2MB
+
+app:
+  base-url: ${APP_BASE_URL:http://localhost:8080}   # used inside QR codes and PDFs
+  demo-data: ${APP_DEMO_DATA:false}                 # demo accounts are opt-in
+  log-ip: ${APP_LOG_IP:true}                        # store the client IP in verification logs
+  bootstrap-admin:
+    email: ${INITIAL_ADMIN_EMAIL:}
+    password: ${INITIAL_ADMIN_PASSWORD:}
+  storage:
+    upload-dir: ${UPLOAD_DIR:./storage/uploads}
+    certificate-dir: ${CERTIFICATE_DIR:./storage/certificates}
+    qr-dir: ${QR_DIR:./storage/qr}
+
+logging:
+  level:
+    root: INFO
+    com.digitalcertificate: INFO

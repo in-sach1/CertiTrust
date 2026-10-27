@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/public :: pub(~{::title}, ~{::main})}">
+<head><title>Project Design | CertiTrust</title></head>
+<body>
+<main class="container pb-5" style="max-width:1100px">
+    <div class="text-center mb-5">
+        <span class="kicker">Project design</span>
+        <h1 class="section-title mt-3">How CertiTrust is <span class="text-gradient">designed</span></h1>
+        <p class="text-muted">The UML class diagram, database structure and workflows from the Phase-2 report, and where each Java concept is used in the code.</p>
+    </div>
+
+    <h2 class="h4 mb-3">UML class diagrams</h2>
+    <div class="diagram-card mb-2"><a th:href="@{/img/design/class-roles.svg}" target="_blank"><img th:src="@{/img/design/class-roles.svg}" alt="UML class diagram: account roles"></a></div>
+    <p class="small text-muted mb-3">1/3 - Inheritance: <code>AdministratorAccount</code>, <code>IssuerAccount</code> and <code>VerifierAccount</code> extend the abstract class <code>Account</code> and override its role-specific methods. Click a diagram to open it full size.</p>
+    <div class="diagram-card mb-2"><a th:href="@{/img/design/class-services.svg}" target="_blank"><img th:src="@{/img/design/class-services.svg}" alt="UML class diagram: interfaces, services and exceptions"></a></div>
+    <p class="small text-muted mb-3">2/3 - Interfaces and exception handling: <code>CertificateService</code> implements <code>CertificateOperations</code> and <code>VerificationOperations</code>; custom exceptions extend <code>BusinessException</code> and <code>ResourceNotFoundException</code>.</p>
+    <div class="diagram-card mb-2"><a th:href="@{/img/design/entity-diagram.svg}" target="_blank"><img th:src="@{/img/design/entity-diagram.svg}" alt="UML class diagram: entities"></a></div>
+    <p class="small text-muted mb-5">3/3 - Entities (stored objects) and their associations.</p>
+
+    <h2 class="h4 mb-3">Database structure (ER diagram)</h2>
+    <div class="diagram-card mb-2"><a th:href="@{/img/design/er-diagram.svg}" target="_blank"><img th:src="@{/img/design/er-diagram.svg}" alt="Entity relationship diagram"></a></div>
+    <p class="small text-muted mb-5">Six tables with primary keys, foreign keys and unique constraints. The SQL script is in <code>docs/schema.sql</code> (Hibernate also creates the tables automatically).</p>
+
+    <div class="row g-4 mb-5">
+        <div class="col-lg-6"><h2 class="h4 mb-3">Certificate issuing workflow</h2>
+            <div class="diagram-card"><a th:href="@{/img/design/issue-flow.svg}" target="_blank"><img th:src="@{/img/design/issue-flow.svg}" alt="Issuing workflow"></a></div></div>
+        <div class="col-lg-6"><h2 class="h4 mb-3">Certificate verification flow</h2>
+            <div class="diagram-card"><a th:href="@{/img/design/verify-flow.svg}" target="_blank"><img th:src="@{/img/design/verify-flow.svg}" alt="Verification flow"></a></div></div>
+    </div>
+
+    <h2 class="h4 mb-3">Java concepts and where they are used</h2>
+    <div class="glass p-3 mb-5"><div class="table-responsive">
+        <table class="table concept-table mb-0">
+            <thead><tr><th>Concept</th><th>Where in the project</th></tr></thead>
+            <tbody>
+            <tr><td>Classes and objects</td><td>Entities <code>User</code>, <code>Certificate</code>, <code>VerificationLog</code>, <code>Revocation</code>, <code>Institution</code>; role objects <code>AdministratorAccount</code>, <code>IssuerAccount</code>, <code>VerifierAccount</code></td></tr>
+            <tr><td>Encapsulation</td><td>Private fields with getters/setters in every entity and in <code>Account</code>; passwords stored only as BCrypt hashes</td></tr>
+            <tr><td>Inheritance</td><td>The three account classes extend <code>Account</code>; <code>InvalidInputException</code> extends <code>BusinessException</code>; <code>CertificateNotFoundException</code> extends <code>ResourceNotFoundException</code></td></tr>
+            <tr><td>Polymorphism (overriding)</td><td><code>role()</code>, <code>permissions()</code>, <code>dashboardPath()</code>, <code>describe()</code> are overridden per role; <code>DashboardController</code> calls them on an <code>Account</code> without knowing the subclass</td></tr>
+            <tr><td>Polymorphism (overloading)</td><td><code>Account.can(Permission)</code> / <code>can(String)</code>; five <code>CertificateService.search(...)</code> variants; <code>verify(id)</code> / <code>verify(id, verifier, ip)</code></td></tr>
+            <tr><td>Abstraction and interfaces</td><td>Abstract class <code>Account</code>; interfaces <code>CertificateOperations</code> and <code>VerificationOperations</code> implemented by <code>CertificateService</code></td></tr>
+            <tr><td>Collections</td><td><code>ReportService</code> (List, Set/TreeSet, EnumMap, TreeMap, LinkedHashMap); permission sets as <code>EnumSet</code></td></tr>
+            <tr><td>Exception handling</td><td><code>InvalidCertificateIdException</code>, <code>CertificateNotFoundException</code>, <code>InvalidInputException</code>, a global <code>ApiExceptionHandler</code> and friendly 400/403/404/500 pages</td></tr>
+            </tbody>
+        </table></div></div>
+
+    <h2 class="h4 mb-3">Module structure</h2>
+    <div class="glass p-3"><div class="table-responsive">
+        <table class="table concept-table mb-0">
+            <thead><tr><th>Module</th><th>Main classes</th></tr></thead>
+            <tbody>
+            <tr><td>User management</td><td><code>UserService</code>, <code>AuthController</code>, <code>AdminController</code> (users)</td></tr>
+            <tr><td>Certificate issuance</td><td><code>CertificateService.issue</code>, <code>IssuerController</code>, <code>QrCodeService</code>, <code>PdfCertificateService</code></td></tr>
+            <tr><td>Certificate records</td><td><code>CertificateService</code> (update, revoke), <code>CertificateRepository</code>, <code>Revocation</code></td></tr>
+            <tr><td>Certificate search</td><td><code>CertificateService.search</code> overloads, <code>CertificateSpecs</code>, <code>CertificateSearchCriteria</code></td></tr>
+            <tr><td>Verification</td><td><code>CertificateService.verify</code>, <code>VerifyController</code>, <code>CertificateHasher</code></td></tr>
+            <tr><td>Verification status tracking</td><td><code>VerificationStatus</code>, <code>VerificationLog</code>, <code>Certificate.getDisplayStatus()</code></td></tr>
+            <tr><td>Administration and reports</td><td><code>AdminController</code>, <code>ReportService</code>, <code>AuditService</code>, <code>DashboardService</code></td></tr>
+            </tbody>
+        </table></div></div>
+</main>
+</body>
+</html>

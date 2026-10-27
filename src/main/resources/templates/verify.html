@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/public :: pub(~{::title}, ~{::main})}">
+<head><title>Verify Certificate | CertiTrust</title></head>
+<body>
+<main class="container pb-5" style="max-width:900px">
+    <div class="text-center mb-4">
+        <span class="kicker"><i class="bi bi-qr-code-scan"></i> Public verification</span>
+        <h1 class="section-title mt-3">Verify a <span class="text-gradient">Certificate</span></h1>
+        <p class="text-muted">Enter the certificate ID or scan its QR code. No login required.</p>
+    </div>
+
+    <div class="glass verify-box">
+        <form th:action="@{/verify}" method="get" class="row g-2">
+            <div class="col-md-9">
+                <label class="form-label" for="certificateId">Certificate ID</label>
+                <input type="text" class="form-control form-control-lg" id="certificateId" name="certificateId"
+                       th:value="${certificateId}" placeholder="CERT-2026-000123" maxlength="64" required autofocus>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-glow btn-lg w-100" data-loading><i class="bi bi-shield-check"></i> Verify Certificate</button>
+            </div>
+        </form>
+
+        <hr class="my-4" style="border-color:var(--border)">
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+            <button type="button" id="scanToggle" class="btn btn-ghost"><i class="bi bi-camera"></i> Scan with camera</button>
+            <label class="btn btn-ghost mb-0" for="scanFile"><i class="bi bi-image"></i> Scan from image</label>
+            <input type="file" id="scanFile" accept="image/*" class="d-none">
+            <span id="scanMsg" class="small text-muted"></span>
+        </div>
+        <div id="scanBox" class="scan-frame d-none"><div id="reader"></div></div>
+        <div id="reader-file" class="d-none"></div>
+    </div>
+
+    <!-- RESULT -->
+    <div th:if="${result != null}" class="mt-4"
+         th:with="state=${result.status.name()}, cls=${result.status.name() == 'VERIFIED' ? 'ok' : (result.status.name() == 'REVOKED' or result.status.name() == 'EXPIRED' ? 'warn' : 'bad')}">
+        <div class="result-card" th:classappend="${cls}">
+            <div class="d-flex flex-column flex-sm-row align-items-center gap-3 mb-3 text-center text-sm-start">
+                <svg class="result-icon" viewBox="0 0 64 64" aria-hidden="true">
+                    <circle cx="32" cy="32" r="30"/>
+                    <path th:if="${cls == 'ok'}" d="M19 33l9 9 17-19"/>
+                    <path th:if="${cls == 'warn'}" d="M32 18v20M32 46v1"/>
+                    <path th:if="${cls == 'bad'}" d="M22 22l20 20M42 22L22 42"/>
+                </svg>
+                <div>
+                    <div class="small text-uppercase fw-semibold" style="letter-spacing:1px" th:text="${cls == 'ok' ? 'Verification Status: VERIFIED' : 'Verification Status: ' + state}">VERIFIED</div>
+                    <h2 class="h3 mb-1" th:text="${result.status.title}">Verified Certificate</h2>
+                    <div class="text-muted" th:text="${result.status.message}">message</div>
+                </div>
+            </div>
+
+            <div th:if="${result.certificate == null}" class="text-muted">
+                Searched for: <strong class="text-white" th:text="${result.certificateId}">ID</strong>.
+                <span th:if="${result.invalidFormat}">That does not look like a CertiTrust ID. IDs look like <strong class="text-white">CERT-2026-000123</strong>.</span>
+                <span th:if="${state == 'NOT_FOUND' and !result.invalidFormat}">Check the ID for typing mistakes, or ask the certificate holder for the original.</span>
+                <span th:if="${state == 'TAMPERED'}">Please contact the issuing institution.</span>
+            </div>
+
+            <div th:if="${result.certificate != null}">
+                <dl class="kv mt-3" th:with="c=${result.certificate}">
+                    <dt>Certificate ID</dt><dd><strong th:text="${c.certificateId}">CERT-2026-000001</strong></dd>
+                    <dt>Recipient</dt><dd th:text="${c.recipientName}">Name</dd>
+                    <dt>Course / Degree</dt><dd th:text="${c.course}">Course</dd>
+                    <dt>Certificate Type</dt><dd th:text="${c.certificateType.label}">Type</dd>
+                    <dt>Institution</dt><dd th:text="${c.institutionName}">Institution</dd>
+                    <dt>Issuer</dt><dd th:text="${c.issuer.name}">Issuer</dd>
+                    <dt>Issue Date</dt><dd th:text="${#temporals.format(c.issueDate, 'dd MMM yyyy')}">date</dd>
+                    <dt>Expiry Date</dt><dd th:text="${c.expiryDate != null ? #temporals.format(c.expiryDate, 'dd MMM yyyy') : 'No expiry'}">date</dd>
+                    <dt th:if="${c.grade != null}">Grade / Score</dt><dd th:if="${c.grade != null}" th:text="${c.grade}">A</dd>
+                    <dt>Verified at</dt><dd th:text="${#temporals.format(result.verifiedAt, 'dd MMM yyyy, HH:mm:ss')}">time</dd>
+                    <dt>Verification Code (hash)</dt>
+                    <dd><span class="hash" th:text="${c.shortHash}">9f2c…b81e</span>
+                        <button type="button" class="btn btn-sm btn-ghost ms-1" th:attr="data-copy=${c.certificateHash}"><i class="bi bi-clipboard"></i> Copy full hash</button></dd>
+                    <dt th:if="${result.revocation != null}">Revoked on</dt>
+                    <dd th:if="${result.revocation != null}" th:text="${#temporals.format(result.revocation.revokedAt, 'dd MMM yyyy, HH:mm')}">date</dd>
+                    <dt th:if="${result.revocation != null}">Revocation reason</dt>
+                    <dd th:if="${result.revocation != null}" th:text="${result.revocation.reason}">reason</dd>
+                </dl>
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a class="btn btn-glow" th:href="@{/certificate/{id}(id=${result.certificate.certificateId})}"><i class="bi bi-file-earmark-text"></i> View details</a>
+                    <a class="btn btn-ghost" th:href="@{/certificate/{id}/download(id=${result.certificate.certificateId})}"><i class="bi bi-download"></i> Download PDF</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script th:src="@{/js/scanner.js}"></script>
+</body>
+</html>
